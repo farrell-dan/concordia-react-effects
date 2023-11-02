@@ -4,6 +4,7 @@ import Item from "./Item";
 import { useState } from "react";
 
 import cookieSrc from "../cookie.svg";
+import useInterval from "../hooks/use-interval";
 
 const items = [
   { id: "cursor", name: "Cursor", cost: 10, value: 1 },
@@ -31,13 +32,26 @@ const Game = () => {
       window.alert("Not enough cookies to purchase this item.")
     }
   }
+
+  const calculateCookiesPerTick = (purchasedItems) => {
+    return items.reduce((total, item) => {
+      return total + purchasedItems[item.id] * item.value;
+    }, 0) 
+  }
+
+  useInterval(() => {
+    const numOfGeneratedCookies = calculateCookiesPerTick(purchasedItems);
+    setNumCookies(numCookies + numOfGeneratedCookies)
+    // Add this number of cookies to the total
+  }, 1000);
+
   return (
     <Wrapper>
       <GameArea>
         <Indicator>
           <Total>{numCookies} cookies</Total>
           {/* TODO: Calcuate the cookies per second and show it here: */}
-          <BoldSpan>0</BoldSpan> cookies per second
+          <BoldSpan>{calculateCookiesPerTick(purchasedItems)}</BoldSpan> cookies per second
         </Indicator>
         <Button onClick={() => setNumCookies(numCookies + 1)}>
           <Cookie src={cookieSrc} />
