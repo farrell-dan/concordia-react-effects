@@ -1,6 +1,7 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import Item from "./Item";
+import { useState } from "react";
 
 import cookieSrc from "../cookie.svg";
 
@@ -12,13 +13,24 @@ const items = [
 
 const Game = () => {
   // TODO: Replace this with React state!
-  const numCookies = 100;
-  const purchasedItems = {
+  const [numCookies, setNumCookies]  = useState(100);
+  const [purchasedItems, setPurchasedItems] = useState({
     cursor: 0,
     grandma: 0,
     farm: 0,
-  };
+  });
 
+  const handlePurchase = (item) => {
+    if (numCookies >= item.cost) {
+      setNumCookies(numCookies-item.cost);
+
+      setPurchasedItems({
+        ...purchasedItems, [item.id]: purchasedItems[item.id] + 1,
+      })
+    } else { 
+      window.alert("Not enough cookies to purchase this item.")
+    }
+  }
   return (
     <Wrapper>
       <GameArea>
@@ -27,7 +39,7 @@ const Game = () => {
           {/* TODO: Calcuate the cookies per second and show it here: */}
           <BoldSpan>0</BoldSpan> cookies per second
         </Indicator>
-        <Button>
+        <Button onClick={() => setNumCookies(numCookies + 1)}>
           <Cookie src={cookieSrc} />
         </Button>
       </GameArea>
@@ -36,7 +48,7 @@ const Game = () => {
         <SectionTitle>Items:</SectionTitle>
         {/* TODO: Add <Item> instances here, 1 for each item type. */}
         {items.map((item) => (
-          <Item key={item.id} name={item.name} cost={item.cost} value={item.value} numOwned={purchasedItems[item.id]} handleClick={()=>console.log}/>
+          <Item key={item.id} name={item.name} cost={item.cost} value={item.value} numOwned={purchasedItems[item.id]} handleClick={()=>handlePurchase(item)}/>
         ))}
         
       </ItemArea>
