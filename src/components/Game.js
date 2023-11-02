@@ -53,6 +53,19 @@ const Game = () => {
     }
   }, [numCookies])
 
+  const handleKeydown = (event) => {
+    if (event.code === "Space"){
+      setNumCookies(numCookies + 1)
+    }
+  }
+  useEffect (() => {
+    window.addEventListener("keydown", handleKeydown);
+    return () => {
+      window.removeEventListener("keydown", handleKeydown)
+    }
+  }, [handleKeydown]);
+
+  console.log(numCookies)
   return (
     <Wrapper>
       <GameArea>
