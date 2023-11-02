@@ -1,7 +1,7 @@
 import styled from "styled-components";
 import { Link } from "react-router-dom";
 import Item from "./Item";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import cookieSrc from "../cookie.svg";
 import useInterval from "../hooks/use-interval";
@@ -14,7 +14,7 @@ const items = [
 
 const Game = () => {
   // TODO: Replace this with React state!
-  const [numCookies, setNumCookies]  = useState(100);
+  const [numCookies, setNumCookies] = useState(100);
   const [purchasedItems, setPurchasedItems] = useState({
     cursor: 0,
     grandma: 0,
@@ -23,27 +23,35 @@ const Game = () => {
 
   const handlePurchase = (item) => {
     if (numCookies >= item.cost) {
-      setNumCookies(numCookies-item.cost);
+      setNumCookies(numCookies - item.cost);
 
       setPurchasedItems({
-        ...purchasedItems, [item.id]: purchasedItems[item.id] + 1,
-      })
-    } else { 
-      window.alert("Not enough cookies to purchase this item.")
+        ...purchasedItems,
+        [item.id]: purchasedItems[item.id] + 1,
+      });
+    } else {
+      window.alert("Not enough cookies to purchase this item.");
     }
-  }
+  };
 
   const calculateCookiesPerTick = (purchasedItems) => {
     return items.reduce((total, item) => {
       return total + purchasedItems[item.id] * item.value;
-    }, 0) 
-  }
+    }, 0);
+  };
 
   useInterval(() => {
     const numOfGeneratedCookies = calculateCookiesPerTick(purchasedItems);
-    setNumCookies(numCookies + numOfGeneratedCookies)
-    // Add this number of cookies to the total
+    setNumCookies(numCookies + numOfGeneratedCookies);
   }, 1000);
+
+  useEffect(() => {
+    document.title = `${numCookies} cookies - Cookie Clicker Workshop`
+  
+    return () => {
+      document.title = `Cookie Clicker Workshop`
+    }
+  }, [numCookies])
 
   return (
     <Wrapper>
@@ -51,7 +59,8 @@ const Game = () => {
         <Indicator>
           <Total>{numCookies} cookies</Total>
           {/* TODO: Calcuate the cookies per second and show it here: */}
-          <BoldSpan>{calculateCookiesPerTick(purchasedItems)}</BoldSpan> cookies per second
+          <BoldSpan>{calculateCookiesPerTick(purchasedItems)}</BoldSpan> cookies
+          per second
         </Indicator>
         <Button onClick={() => setNumCookies(numCookies + 1)}>
           <Cookie src={cookieSrc} />
@@ -62,9 +71,15 @@ const Game = () => {
         <SectionTitle>Items:</SectionTitle>
         {/* TODO: Add <Item> instances here, 1 for each item type. */}
         {items.map((item) => (
-          <Item key={item.id} name={item.name} cost={item.cost} value={item.value} numOwned={purchasedItems[item.id]} handleClick={()=>handlePurchase(item)}/>
+          <Item
+            key={item.id}
+            name={item.name}
+            cost={item.cost}
+            value={item.value}
+            numOwned={purchasedItems[item.id]}
+            handleClick={() => handlePurchase(item)}
+          />
         ))}
-        
       </ItemArea>
       <HomeLink to="/">Return home</HomeLink>
     </Wrapper>
@@ -72,8 +87,8 @@ const Game = () => {
 };
 
 const BoldSpan = styled.span`
-    font-weight: bold;
-`
+  font-weight: bold;
+`;
 
 const Wrapper = styled.div`
   display: flex;
